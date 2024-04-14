@@ -1,71 +1,78 @@
-#função para conectar ao banco de dados postgresql
 import psycopg2
+from psycopg2 import Error
 
 
-def conecta_bd():
+def conectar_bd():
     """
-    A function that establishes a connection to the database using the psycopg2 library.
-    It attempts to connect to a database with the provided credentials and returns the connection object if successful,
-    otherwise, it prints the error and returns None.
+    Função que estabelece uma conexão com o banco de dados utilizando a biblioteca psycopg2.
+    Retorna o objeto de conexão se for bem-sucedido, caso contrário, imprime o erro e retorna None.
     """
-    global conn
     try:
-        conn = psycopg2.connect(host="localhost", database="postgres", user="postgres", password="250502")
-        #verifica se a conexão foi efetuada com sucesso
-        print("Conexão efetuada com sucesso")
+        config = {
+            'host': 'localhost',
+            'database': 'postgres',
+            'user': 'postgres',
+            'password': '250502'
+        }
+        conn = psycopg2.connect(**config)
+        print("Conexão estabelecida com sucesso")
         return conn
-    except Exception as e:
-        print("Erro: ", e)
+    except Error as e:
+        print("Erro ao conectar ao banco de dados:", e)
         return None
 
 
+def desconectar_bd(conn):
+    """
+    Fecha a conexão com o banco de dados e imprime uma mensagem de sucesso.
+    """
+    try:
+        if conn:
+            conn.close()
+            print("Conexão encerrada com sucesso")
+    except Error as e:
+        print("Erro ao desconectar do banco de dados:", e)
 
-def desconecta_bd():
-    """
-    Closes the database connection and prints a success message.
-    """
-    global conn
-    conn.close()
-    print("Conexão encerrada com sucesso")
 
 def criar_banco():
     """
-    Function to create a database. It connects to the database, sets autocommit to True, creates a database named
-    'escola', disconnects from the database, and prints a success message. If an exception occurs, it prints an error
-    message with the exception details.
+    Função para criar um banco de dados chamado 'escola'.
     """
     try:
-        conn = conecta_bd()
-        cursor = conn.cursor()
-        # Configura autocommit para True
-        conn.autocommit = True
-        cursor.execute("CREATE DATABASE escola")
-        desconecta_bd()
-        print("Banco de dados criado com sucesso")
-    except Exception as e:
-        print("Erro ao criar o banco de dados: ", e)
+        conn = conectar_bd()
+        if conn:
+            conn.autocommit = True
+            with conn.cursor() as cursor:
+                cursor.execute("CREATE DATABASE escola")
+            print("Banco de dados criado com sucesso")
+    except Error as e:
+        print("Erro ao criar o banco de dados:", e)
+    finally:
+        desconectar_bd(conn)
 
 
-def verifica_banco():
+def verificar_banco():
     """
-    Function to verify the existence of a database schema named 'escola'.
+    Função para verificar se o banco de dados 'escola' existe.
+    Retorna True se o banco de dados existe, False caso contrário.
     """
     try:
-        conn = conecta_bd()
-        cursor = conn.cursor()
-        cursor.execute("SELECT EXISTS(SELECT * FROM information_schema.schemata WHERE schema_name = 'escola')")
-        resultado = cursor.fetchone()[0]
-        cursor.close()  # Fechando explicitamente o cursor
-        desconecta_bd()
-        return resultado
-    except Exception as e:
-        print("Erro ao verificar o banco de dados: ", e)
+        conn = conectar_bd()
+        if conn:
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT EXISTS(SELECT * FROM pg_catalog.pg_database WHERE datname = 'escola')")
+                    resultado = cursor.fetchone()[0]
+            return resultado
+    except Error as e:
+        print("Erro ao verificar o banco de dados:", e)
+    finally:
+        desconectar_bd(conn)
         return False
 
 
-
 if __name__ == '__main__':
-    if not verifica_banco():
+    if not verificar_banco():
         criar_banco()
     else:
-        print("Banco de dados ja existe")
+        print("O banco de dados já existe")
