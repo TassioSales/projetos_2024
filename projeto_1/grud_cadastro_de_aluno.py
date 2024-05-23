@@ -2,6 +2,7 @@ import psycopg2
 from datetime import datetime
 import random
 
+
 def conectar_banco():
     try:
         conn = psycopg2.connect(
@@ -16,6 +17,7 @@ def conectar_banco():
         print(f"Erro ao conectar ao banco de dados: {e}")
         return None
 
+
 def obter_dados_aluno():
     nome = input("Digite o nome do aluno: ")
     idade = int(input("Digite a idade do aluno: "))
@@ -23,13 +25,15 @@ def obter_dados_aluno():
     nome_da_mae = input("Digite o nome da mãe: ")
     while True:
         try:
-            data_de_nascimento = datetime.strptime(input("Digite a data de nascimento do aluno (formato: dd-mm-yyyy): "), "%d-%m-%Y")
+            data_de_nascimento = datetime.strptime(
+                input("Digite a data de nascimento do aluno (formato: dd-mm-yyyy): "), "%d-%m-%Y")
             break
         except ValueError:
             print("Formato de data inválido. Por favor, digite a data no formato dd-mm-yyyy.")
     while True:
         try:
-            data_de_matricula = datetime.strptime(input("Digite a data de matrícula do aluno (formato: dd-mm-yyyy): "), "%d-%m-%Y")
+            data_de_matricula = datetime.strptime(input("Digite a data de matrícula do aluno (formato: dd-mm-yyyy): "),
+                                                  "%d-%m-%Y")
             break
         except ValueError:
             print("Formato de data inválido. Por favor, digite a data no formato dd-mm-yyyy.")
@@ -53,10 +57,17 @@ def obter_dados_aluno():
         turno, responsavel, observacao
     )
 
+
+#criar função para gerar_id aleatório com 9 digitos usando a biblioteca random
+
+def gerar_id():
+    return random.randint(100000000, 999999999)
+
+
 def inserir_aluno(conn):
     try:
         cursor = conn.cursor()
-        aluno_id = gerar_id(conn)
+        aluno_id = gerar_id()
         dados_aluno = obter_dados_aluno()
         cursor.execute("""
             INSERT INTO alunos (
@@ -72,16 +83,6 @@ def inserir_aluno(conn):
     finally:
         cursor.close()
 
-def consultar_alunos(conn):
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM alunos")
-        alunos = cursor.fetchall()
-        return alunos
-    except psycopg2.Error as e:
-        print(f"Erro ao consultar alunos: {e}")
-    finally:
-        cursor.close()
 
 def excluir_aluno(conn):
     try:
@@ -103,6 +104,7 @@ def excluir_aluno(conn):
         print(f"Erro ao excluir aluno: {e}")
     finally:
         cursor.close()
+
 
 def atualizar_aluno(conn):
     try:
@@ -127,6 +129,18 @@ def atualizar_aluno(conn):
 def sair():
     print("Saindo...")
 
+
+def consultar_alunos(conn):
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM alunos")
+        alunos = cursor.fetchall()
+        return alunos
+    except psycopg2.Error as e:
+        print(f"Erro ao consultar alunos: {e}")
+
+
+# Adicione a exibição dos resultados na função main
 def main():
     conn = conectar_banco()
     if conn:
@@ -147,13 +161,19 @@ def main():
                 opcao = input("Escolha uma opção: ")
                 funcao = opcoes_menu.get(opcao)
                 if funcao:
-                    funcao(conn)
+                    if opcao == '2':
+                        alunos = funcao(conn)
+                        for aluno in alunos:
+                            print(aluno)  # Exibe cada aluno
+                    else:
+                        funcao(conn)
                 else:
                     print("Opção inválida. Tente novamente.")
         except KeyboardInterrupt:
             print("\nPrograma encerrado pelo usuário.")
         finally:
             conn.close()
+
 
 if __name__ == '__main__':
     main()
