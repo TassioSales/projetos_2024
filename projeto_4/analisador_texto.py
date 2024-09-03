@@ -1,4 +1,6 @@
 import re
+
+
 class AnalisadorTexto:
     def __init__(self, texto):
         self.texto = texto
@@ -21,8 +23,6 @@ class AnalisadorTexto:
                 freq[palavra] = 1
         return freq
 
-
-
     def palavras_unicas(self):
         palavras = self.texto.split()
         unicas = []
@@ -33,7 +33,6 @@ class AnalisadorTexto:
 
     def contar_frases(self):
         return self.texto.count('.') + self.texto.count('!') + self.texto.count('?')
-
 
     def contar_caracteres(self):
         return len(self.texto)
@@ -63,9 +62,8 @@ class AnalisadorTexto:
         print(f'Palavras unicas: {self.palavras_unicas()}')
         print(f'Frequencia das palavras: {self.freq_palavras()}')
 
+
 if __name__ == '__main__':
     texto = "Python é uma linguagem de programação poderosa. Fácil de aprender e divertida de usar! Você vai adorar programar em Python."
     analisador = AnalisadorTexto(texto)
     analisador.execute()
-
-
