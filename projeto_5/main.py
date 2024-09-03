@@ -1,4 +1,3 @@
-
 class Tarefa:
     def __init__(self, titulo, descricao, concluida=False):
         self.titulo = titulo
@@ -7,6 +6,7 @@ class Tarefa:
 
     def __str__(self):
         return f"Título: {self.titulo}\nDescrição: {self.descricao}\nConcluída: {self.concluida}"
+
 
 class GestorDeTarefas:
     def __init__(self):
@@ -68,8 +68,6 @@ class GestorDeTarefas:
                 break
             else:
                 print("Opção inválida. Tente novamente.")
-
-
 
 
 if __name__ == "__main__":
