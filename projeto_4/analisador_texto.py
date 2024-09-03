@@ -13,7 +13,7 @@ class AnalisadorTexto:
         return re.sub(r'[^A-Za-z0-9\s]', '', self.texto)
 
     def freq_palavras(self):
-        texto_tratado = self.remover_caracteres_especiais()
+        texto_tratado = self.remover_caracteres_especiais().lower()
         palavras = texto_tratado.split()
         freq = {}
         for palavra in palavras:
@@ -24,10 +24,11 @@ class AnalisadorTexto:
         return freq
 
     def palavras_unicas(self):
-        palavras = self.texto.split()
+        texto_tratado = self.remover_caracteres_especiais().lower()
+        palavras = texto_tratado.split()
         unicas = []
         for palavra in palavras:
-            if palavra not in unicas:
+            if (palavra not in unicas) and (len(palavra) > 1):
                 unicas.append(palavra)
         return unicas
 
